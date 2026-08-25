@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurèle Kouakou — Dossier développeur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#15140F;
+    --bg-alt:#1B1A13;
+    --paper:#E7E2D2;
+    --paper-dim:#D7D1BB;
+    --ink:#1C1A14;
+    --ink-soft:#5A5642;
+    --rust:#C1451D;
+    --rust-dim:#8A3316;
+    --stamp:#8B1E1E;
+    --olive:#6B7358;
+    --olive-dim:#3A4032;
+    --line: rgba(231,226,210,0.14);
+    --line-strong: rgba(231,226,210,0.28);
+    --display:'Oswald',sans-serif;
+    --body:'IBM Plex Sans',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--paper);
+    font-family:var(--body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{color:inherit;}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--rust); outline-offset:3px;}
+
+  .wrap{
+    max-width:1040px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  /* subtle grain / grid texture */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:0.35;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ===== NAV ===== */
+  nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(21,20,15,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line-strong);
+  }
+  .nav-inner{
+    max-width:1040px; margin:0 auto; padding:0 28px;
+    display:flex; align-items:center; justify-content:space-between;
+    height:56px;
+  }
+  .nav-id{
+    font-family:var(--mono); font-size:12px; letter-spacing:0.12em;
+    color:var(--rust); text-transform:uppercase;
+  }
+  .nav-links{
+    display:flex; gap:24px; list-style:none; margin:0; padding:0;
+  }
+  .nav-links a{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.1em;
+    text-transform:uppercase; text-decoration:none; color:var(--paper-dim);
+    transition:color 0.15s;
+  }
+  .nav-links a:hover{color:var(--rust);}
+  @media (max-width:640px){ .nav-links{gap:14px;} .nav-links li:nth-child(4){display:none;} }
+
+  /* ===== HERO ===== */
+  header.hero{
+    position:relative; z-index:1;
+    padding:96px 0 72px;
+    border-bottom:1px solid var(--line-strong);
+  }
+  .stamp{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:11px; letter-spacing:0.15em;
+    color:var(--stamp); border:1px solid var(--stamp);
+    padding:5px 12px; text-transform:uppercase;
+    transform:rotate(-1.5deg);
+    margin-bottom:28px;
+  }
+  .stamp::before{content:"●"; font-size:8px;}
+  h1.title{
+    font-family:var(--display); font-weight:700;
+    font-size:clamp(44px, 8vw, 84px);
+    line-height:0.98; letter-spacing:-0.01em;
+    text-transform:uppercase; margin:0 0 6px;
+    color:var(--paper);
+  }
+  .title .accent{color:var(--rust);}
+  .role-line{
+    font-family:var(--mono); font-size:14px; color:var(--olive);
+    text-transform:uppercase; letter-spacing:0.08em; margin:0 0 28px;
+  }
+  .pitch{
+    max-width:620px; font-size:17px; color:var(--paper-dim);
+    margin:0 0 32px;
+  }
+  .contact-chips{ display:flex; flex-wrap:wrap; gap:10px; }
+  .chip{
+    font-family:var(--mono); font-size:12px;
+    border:1px solid var(--line-strong); padding:8px 14px;
+    text-decoration:none; color:var(--paper-dim);
+    transition:border-color 0.15s, color 0.15s;
+  }
+  .chip:hover{border-color:var(--rust); color:var(--rust);}
+
+  /* ===== FICHE / STATS ===== */
+  section.fiche{
+    position:relative; z-index:1;
+    padding:56px 0;
+    border-bottom:1px solid var(--line-strong);
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.18em;
+    text-transform:uppercase; color:var(--rust); margin:0 0 20px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::after{content:""; flex:1; height:1px; background:var(--line-strong);}
+  .stat-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--line-strong); border:1px solid var(--line-strong);
+  }
+  @media (max-width:720px){ .stat-grid{grid-template-columns:repeat(2,1fr);} }
+  .stat-cell{
+    background:var(--bg); padding:20px 18px;
+  }
+  .stat-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--olive); margin:0 0 8px;
+  }
+  .stat-value{
+    font-family:var(--display); font-size:19px; color:var(--paper);
+    text-transform:uppercase; line-height:1.25;
+  }
+
+  /* ===== MISSIONS ===== */
+  section.missions{ position:relative; z-index:1; padding:64px 0 24px; }
+  .mission{
+    background:var(--paper); color:var(--ink);
+    margin-bottom:36px; position:relative;
+    border:1px solid var(--paper-dim);
+  }
+  .mission-head{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:16px; padding:26px 30px 20px; border-bottom:1px dashed var(--ink-soft);
+  }
+  .mission-num{ font-family:var(--mono); font-size:12px; color:var(--rust); letter-spacing:0.1em; margin:0 0 6px; text-transform:uppercase;}
+  .mission-title{ font-family:var(--display); font-size:clamp(24px,4vw,32px); text-transform:uppercase; margin:0; letter-spacing:-0.01em;}
+  .mission-status{
+    font-family:var(--mono); font-size:10px; letter-spacing:0.08em;
+    text-transform:uppercase; padding:6px 10px; white-space:nowrap;
+    border:1px solid currentColor;
+  }
+  .status-open{ color:var(--olive-dim); }
+  .status-closed{ color:var(--stamp); }
+  .mission-body{ padding:24px 30px 30px; }
+  .mission-desc{ font-size:15.5px; max-width:640px; margin:0 0 20px; color:#3A362A;}
+  .tag-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px; }
+  .tag{
+    font-family:var(--mono); font-size:11px; text-transform:uppercase;
+    letter-spacing:0.05em; background:var(--olive-dim); color:var(--paper);
+    padding:5px 10px;
+  }
+  .mission-facts{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:14px; margin-bottom:20px;
+    border-top:1px solid var(--ink-soft); padding-top:16px;
+  }
+  .fact dt{ font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); margin:0 0 4px;}
+  .fact dd{ margin:0; font-size:14px; font-weight:600;}
+
+  /* code block */
+  .code-block{
+    background:var(--ink); color:#D9E8D5;
+    font-family:var(--mono); font-size:12.5px; line-height:1.65;
+    padding:18px 20px; overflow-x:auto; margin:6px 0 4px;
+  }
+  .code-block .cm{ color:#8A9A82; }
+  .code-caption{
+    font-family:var(--mono); font-size:11px; color:var(--ink-soft);
+    margin:0 0 22px; text-transform:uppercase; letter-spacing:0.05em;
+  }
+
+  /* schematics */
+  .schema-row{ display:flex; gap:20px; flex-wrap:wrap; margin-bottom:24px; }
+  .schema-card{ flex:1; min-width:240px; }
+  .schema-title{ font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); margin:0 0 8px;}
+  svg.diagram{ width:100%; height:auto; display:block; border:1px solid var(--ink-soft); background:#100F0B; }
+
+  /* ===== SKILLS FOOTER ===== */
+  section.closing{ position:relative; z-index:1; padding:64px 0 40px; text-align:center;}
+  .closing h2{
+    font-family:var(--display); text-transform:uppercase;
+    font-size:clamp(26px,5vw,40px); margin:0 0 14px;
+  }
+  .closing p{ color:var(--paper-dim); max-width:480px; margin:0 auto 28px; }
+  .cta{
+    display:inline-block; font-family:var(--mono); font-size:12px;
+    letter-spacing:0.1em; text-transform:uppercase; text-decoration:none;
+    color:var(--bg); background:var(--rust); padding:14px 26px;
+    transition:background 0.15s;
+  }
+  .cta:hover{ background:var(--paper); }
+
+  footer{
+    position:relative; z-index:1;
+    border-top:1px solid var(--line-strong);
+    padding:24px 0; font-family:var(--mono); font-size:11px;
+    color:var(--olive); text-align:center; letter-spacing:0.05em;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <span class="nav-id">DOSSIER // A.KOUAKOU</span>
+    <ul class="nav-links">
+      <li><a href="#fiche">Fiche</a></li>
+      <li><a href="#missions">Missions</a></li>
+      <li><a href="#mission-01">Arena Survivor</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="stamp">Dossier ouvert — candidature</div>
+    <h1 class="title">Aurèle<br>Kou<span class="accent">a</span>kou</h1>
+    <p class="role-line">Développeur — Bachelor Informatique · IPSSI</p>
+    <p class="pitch">Étudiant en 2ᵉ année de Bachelor Informatique à l'IPSSI, entre développement de jeu sous Unity et outils Python orientés recherche d'information. Ce dossier réunit les projets menés jusqu'ici — code à l'appui.</p>
+    <div class="contact-chips">
+      <a class="chip" href="mailto:paulaurele1@gmail.com">paulaurele1@gmail.com</a>
+      <a class="chip" href="https://github.com/londonmajor11-cell" target="_blank" rel="noopener">github.com/londonmajor11-cell</a>
+      <span class="chip">Ivry-sur-Seine (94)</span>
+    </div>
+  </div>
+</header>
+
+<section class="fiche" id="fiche">
+  <div class="wrap">
+    <p class="eyebrow">Fiche d'identité</p>
+    <div class="stat-grid">
+      <div class="stat-cell">
+        <p class="stat-label">Formation</p>
+        <p class="stat-value">Bachelor Info. — 2ᵉ année, IPSSI</p>
+      </div>
+      <div class="stat-cell">
+        <p class="stat-label">Bac</p>
+        <p class="stat-value">Scientifique (Série D) — 2025</p>
+      </div>
+      <div class="stat-cell">
+        <p class="stat-label">Terrain</p>
+        <p class="stat-value">Unity / C# · Python</p>
+      </div>
+      <div class="stat-cell">
+        <p class="stat-label">Dossiers actifs</p>
+        <p class="stat-value">04 projets référencés</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="missions" id="missions">
+  <div class="wrap">
+    <p class="eyebrow">Journal de missions</p>
+
+    <!-- MISSION 01 -->
+    <article class="mission" id="mission-01">
+      <div class="mission-head">
+        <div>
+          <p class="mission-num">Mission 01 — Solo</p>
+          <h3 class="mission-title">Arena Survivor</h3>
+        </div>
+        <span class="mission-status status-open">Code disponible</span>
+      </div>
+      <div class="mission-body">
+        <p class="mission-desc">Wave shooter en vue TPS développé seul dans le cadre de la formation Unity (IPSSI BTC 1ère année). Le joueur incarne un soldat isolé dans une ville abandonnée et doit tenir face à des vagues de zombies militaires de plus en plus nombreuses — jusqu'à ce que ses points de vie tombent à zéro.</p>
+        <div class="tag-row">
+          <span class="tag">Unity</span>
+          <span class="tag">C#</span>
+          <span class="tag">NavMesh AI</span>
+          <span class="tag">Coroutines</span>
+          <span class="tag">Singleton pattern</span>
+        </div>
+
+        <dl class="mission-facts">
+          <div class="fact"><dt>Santé</dt><dd>100 PV, régénération lente</dd></div>
+          <div class="fact"><dt>Vagues</dt><dd>8 ennemis en vague 1, +3 par vague</dd></div>
+          <div class="fact"><dt>Attaque spéciale</dt><dd>Projectile à dégâts de zone</dd></div>
+          <div class="fact"><dt>Scripts</dt><dd>11 fichiers C#</dd></div>
+        </dl>
+
+        <div class="schema-row">
+          <div class="schema-card">
+            <p class="schema-title">Schéma de l'arène (GDD §4.3)</p>
+            <svg class="diagram" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+              <rect x="14" y="14" width="272" height="172" fill="none" stroke="#8B1E1E" stroke-width="3"/>
+              <rect x="40" y="60" width="46" height="14" fill="#3A4032"/>
+              <rect x="210" y="120" width="14" height="46" fill="#3A4032"/>
+              <rect x="130" y="150" width="50" height="12" fill="#3A4032"/>
+              <circle cx="30" cy="24" r="6" fill="#C1451D"/>
+              <circle cx="270" cy="24" r="6" fill="#C1451D"/>
+              <circle cx="30" cy="176" r="6" fill="#C1451D"/>
+              <circle cx="270" cy="176" r="6" fill="#C1451D"/>
+              <circle cx="150" cy="100" r="9" fill="#E7E2D2"/>
+              <text x="150" y="103" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#100F0B">J</text>
+              <text x="30" y="20" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#E7E2D2">E</text>
+              <text x="270" y="20" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#E7E2D2">E</text>
+              <text x="30" y="192" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#E7E2D2">E</text>
+              <text x="270" y="192" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#E7E2D2">E</text>
+            </svg>
+          </div>
+          <div class="schema-card">
+            <p class="schema-title">HUD en jeu (GDD §5.3)</p>
+            <svg class="diagram" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0" y="0" width="300" height="200" fill="#100F0B"/>
+              <rect x="16" y="160" width="90" height="14" fill="#3A4032"/>
+              <rect x="16" y="160" width="65" height="14" fill="#8B1E1E"/>
+              <text x="16" y="150" font-family="IBM Plex Mono" font-size="9" fill="#6B7358">PV</text>
+              <text x="284" y="30" text-anchor="end" font-family="IBM Plex Mono" font-size="10" fill="#E7E2D2">SCORE 340</text>
+              <text x="284" y="46" text-anchor="end" font-family="IBM Plex Mono" font-size="10" fill="#C1451D">VAGUE 3</text>
+              <circle cx="150" cy="100" r="14" fill="none" stroke="#E7E2D2" stroke-width="1"/>
+              <line x1="150" y1="86" x2="150" y2="94" stroke="#E7E2D2"/>
+              <line x1="150" y1="106" x2="150" y2="114" stroke="#E7E2D2"/>
+              <line x1="136" y1="100" x2="144" y2="100" stroke="#E7E2D2"/>
+              <line x1="156" y1="100" x2="164" y2="100" stroke="#E7E2D2"/>
+            </svg>
+          </div>
+        </div>
+
+        <p class="code-caption">Extrait — KamehamehaProjectile.cs (dégâts de zone à l'impact)</p>
+        <pre class="code-block"><span class="cm">// La boule explose au contact et inflige des dégâts</span>
+<span class="cm">// à tous les zombies présents dans le rayon d'explosion</span>
+void Exploser()
+{
+    Collider[] hits = Physics.OverlapSphere(transform.position, explosionRadius);
+    foreach (Collider hit in hits)
+    {
+        if (hit.CompareTag("Zombie"))
+        {
+            ZombieHealth zh = hit.GetComponent&lt;ZombieHealth&gt;();
+            if (zh != null) zh.PrendreDegats(damage);
+        }
+    }
+    Destroy(gameObject);
+}</pre>
+      </div>
+    </article>
+
+    <!-- MISSION 02 -->
+    <article class="mission" id="mission-02">
+      <div class="mission-head">
+        <div>
+          <p class="mission-num">Mission 02 — Stage entreprise</p>
+          <h3 class="mission-title">Outil OSINT (osint.py)</h3>
+        </div>
+        <span class="mission-status status-closed">Code repris par l'entreprise</span>
+      </div>
+      <div class="mission-body">
+        <p class="mission-desc">Outil Python de recherche et d'investigation en ligne développé pendant un stage. Il combine la recherche web via l'API Serper, l'analyse par IA (Groq), la lecture de documents PDF, la génération automatique de requêtes de recherche avancées (dorks) et un mode chatbot interactif.</p>
+        <div class="tag-row">
+          <span class="tag">Python</span>
+          <span class="tag">Serper API</span>
+          <span class="tag">Groq AI</span>
+          <span class="tag">WSL2</span>
+        </div>
+        <dl class="mission-facts">
+          <div class="fact"><dt>Recherche</dt><dd>Bascule vers Tavily / Serper après blocage DuckDuckGo</dd></div>
+          <div class="fact"><dt>Environnement</dt><dd>Développement sous WSL2</dd></div>
+          <div class="fact"><dt>Sécurité</dt><dd>Retrait des clés API codées en dur</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <!-- MISSION 03 -->
+    <article class="mission" id="mission-03">
+      <div class="mission-head">
+        <div>
+          <p class="mission-num">Mission 03 — Projet d'équipe</p>
+          <h3 class="mission-title">Zombie Survival — Unity 6</h3>
+        </div>
+        <span class="mission-status status-closed">Code non disponible</span>
+      </div>
+      <div class="mission-body">
+        <p class="mission-desc">Jeu de survie développé en C# sous Unity 6 avec une équipe, dans le cadre scolaire. Zombies pilotés par IA via NavMesh, système de vagues à difficulté croissante et système de santé.</p>
+        <div class="tag-row">
+          <span class="tag">Unity 6</span>
+          <span class="tag">C#</span>
+          <span class="tag">NavMesh</span>
+          <span class="tag">Travail d'équipe</span>
+        </div>
+        <dl class="mission-facts">
+          <div class="fact"><dt>Debug notable</dt><dd>Résolution d'un bug de baking NavMesh</dd></div>
+          <div class="fact"><dt>Correctif</dt><dd>Sphere Collider + mismatch de prefab</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <!-- MISSION 04 -->
+    <article class="mission" id="mission-04">
+      <div class="mission-head">
+        <div>
+          <p class="mission-num">Mission 04 — Travaux pratiques</p>
+          <h3 class="mission-title">Fondamentaux Web — PHP</h3>
+        </div>
+        <span class="mission-status status-open">Sur GitHub</span>
+      </div>
+      <div class="mission-body">
+        <p class="mission-desc">Série de TP réalisés à l'IPSSI autour des formulaires PHP et de l'interaction avec des bases de données SQL — les bases du développement back-end.</p>
+        <div class="tag-row">
+          <span class="tag">PHP</span>
+          <span class="tag">SQL</span>
+          <span class="tag">HTML</span>
+        </div>
+        <p style="margin:0;"><a class="chip" href="https://github.com/londonmajor11-cell" target="_blank" rel="noopener" style="color:#8B1E1E; border-color:#8B1E1E;">Voir les dépôts →</a></p>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<section class="closing" id="contact">
+  <div class="wrap">
+    <h2>Dossier consulté.</h2>
+    <p>Ouvert aux stages et opportunités en développement — jeu vidéo comme web. Pour la suite, un mail suffit.</p>
+    <a class="cta" href="mailto:paulaurele1@gmail.com">Ouvrir le contact</a>
+  </div>
+</section>
+
+<footer>
+  FIN DE DOSSIER — A. KOUAKOU — IPSSI 2026
+</footer>
+
+</body>
+</html>
