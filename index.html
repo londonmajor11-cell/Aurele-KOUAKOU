@@ -198,6 +198,18 @@ h2{font-size:clamp(30px,5vw,54px);font-weight:700;line-height:1.08;letter-spacin
 .lb p{position:absolute;bottom:18px;left:0;right:0;text-align:center;color:#C9D1DE;font-size:13px;padding:0 16px}
 @media (max-width:820px){.pcard{grid-template-columns:1fr;height:auto;min-height:0;position:relative;top:auto}.pcard .vis{padding-top:0}}
 
+.also{margin-top:10px;font-size:15px;color:#5E5A50;max-width:760px}
+.also b{color:#16181D}.also a{color:#1E6BEB;font-weight:600}
+/* ===== write-ups ===== */
+.wcard{display:grid;grid-template-columns:1fr 1.3fr;gap:0;margin-top:36px;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:var(--card);transition:transform .4s var(--ease),border-color .3s}
+.wcard:hover{transform:translateY(-5px);border-color:var(--blue)}
+.wimg{background:#0A0C10;display:grid;place-content:center;gap:10px;padding:24px}
+.wimg img{display:block;max-width:100%;border-radius:8px;border:1px solid var(--line)}
+.wtxt{padding:clamp(22px,3vw,36px)}
+.wtxt h3{font-size:clamp(20px,2.4vw,26px);line-height:1.2;margin:8px 0 10px}
+.wtxt p{color:var(--muted);font-size:15px}
+.wlink{display:inline-block;margin-top:16px;font-weight:600;color:var(--blue)}
+@media (max-width:760px){.wcard{grid-template-columns:1fr}}
 /* ===== wipe panel (color rising from bottom) ===== */
 .wipe{position:relative;overflow:hidden}
 .wipe .fill{position:absolute;inset:0;background:var(--blue-2);clip-path:inset(100% 0 0 0);z-index:0}
@@ -302,7 +314,7 @@ footer{border-top:1px solid var(--line);padding:24px clamp(16px,4vw,48px);color:
 <nav aria-label="Navigation principale">
   <a class="brand" href="#top"><i>AK</i>Aurèle Kouakou</a>
   <div class="links">
-    <a href="#profil">Profil</a><a href="#projets">Projets</a><a href="#parcours">Parcours</a><a href="#competences">Compétences</a><a href="#certifications">Certifs</a>
+    <a href="#profil">Profil</a><a href="#projets">Projets</a><a href="#writeups">Write-ups</a><a href="#parcours">Parcours</a><a href="#competences">Compétences</a><a href="#certifications">Certifs</a>
   </div>
   <a class="nav-cta" href="CV_Aurele_Kouakou_Cybersecurite.pdf" download>CV ↓</a>
 </nav>
@@ -385,7 +397,7 @@ footer{border-top:1px solid var(--line);padding:24px clamp(16px,4vw,48px);color:
         <div class="txt">
           <div class="num">01 · STAGE · 18 MAI – 10 JUIL. 2026 · CAPTURES RÉELLES</div>
           <h3>Outil OSINT : enquête en sources ouvertes</h3>
-          <p>Stage chez METM (achat, réparation et reconditionnement d'appareils). Mission : réaliser des recherches OSINT pour rassembler les informations publiques sur une personne avant une embauche. J'ai développé un outil Python qui automatise ces recherches : requêtes web via API, analyse assistée par IA, lecture de PDF, requêtes avancées (dorks), mode chatbot et interface web. L'outil respecte un cadre éthique : sources publiques uniquement, et les accès refusés ne sont jamais contournés. Le code a été repris par l'entreprise.</p>
+          <p>Chez METM, j'ai mené des recherches OSINT sur des candidats avant embauche, puis développé un outil Python qui les automatise : requêtes web, lecture de PDF, synthèse par IA et interface web. Cadre éthique strict : sources publiques uniquement, accès refusés jamais contournés. Le code a été repris par l'entreprise.</p>
           <div class="chips"><span>Python</span><span>Serper API</span><span>Groq AI</span><span>WSL2</span><span>RGPD</span></div>
         </div>
         <div class="vis"><div class="shots">
@@ -400,7 +412,7 @@ footer{border-top:1px solid var(--line);padding:24px clamp(16px,4vw,48px);color:
           <div class="num">02 · TP · FÉVR. 2026 · CAPTURES RÉELLES</div>
           <h3>Intégrer un serveur Linux à un domaine Active Directory</h3>
           <p>Sur quatre jours : jonction d'un serveur Linux au domaine (realm, SSSD, Kerberos), accès SSH réservé au groupe IT, partages Samba sécurisés, script PowerShell d'audit à distance via SSH, requêtes LDAP, supervision de l'espace disque avec cron, et analyse des échecs d'authentification dans les logs.</p>
-          <div class="chips"><span>Linux</span><span>realm / SSSD</span><span>Kerberos</span><span>SSH</span><span>Samba</span><span>LDAP</span><span>PowerShell</span></div>
+          <div class="chips"><span>Linux</span><span>realm / SSSD</span><span>Kerberos</span><span>SSH</span><span>Samba</span><span>LDAP</span><span>PowerShell</span><a href="writeup-linux-active-directory.html" style="font-family:var(--mono);font-size:12px;font-weight:600;padding:4px 0;color:#1E4FB0">lire le write-up →</a></div>
         </div>
         <div class="vis"><div class="shots">
           <figure class="shot s1"><img src="img/linux-realm.png" alt="Résultat de realm list : serveur Linux membre du domaine tp.local" loading="lazy"></figure>
@@ -452,23 +464,33 @@ footer{border-top:1px solid var(--line);padding:24px clamp(16px,4vw,48px);color:
         </div></div>
       </article>
 
-      <article class="pcard c-dark">
-        <div class="txt">
-          <div class="num">06 · DÉVELOPPEMENT · 2025 – 2026</div>
-          <h3>Arena Survivor &amp; fondamentaux web</h3>
-          <p>Un jeu de tir développé seul sous Unity : IA ennemie avec NavMesh, vagues de difficulté croissante et attaque à dégâts de zone (11 scripts C#). Et une série de TP PHP / SQL : formulaires et bases de données, utiles pour comprendre les failles web.</p>
-          <div class="chips"><span>Unity</span><span>C#</span><span>NavMesh AI</span><span>PHP</span><span>SQL</span><a href="https://github.com/londonmajor11-cell?tab=repositories" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:12px;font-weight:600;padding:4px 0">voir sur GitHub →</a></div>
-        </div>
-        <div class="vis"><div class="term" style="background:#232833"><span class="g">// extrait de mon code · Arena Survivor</span><br><span class="b">void</span> Exploser() {<br>&nbsp;&nbsp;Collider[] hits = Physics.<span class="y">OverlapSphere</span>(transform.position, explosionRadius);<br>&nbsp;&nbsp;<span class="b">foreach</span> (Collider hit <span class="b">in</span> hits)<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="b">if</span> (hit.CompareTag(<span class="g">"Zombie"</span>))<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hit.GetComponent&lt;ZombieHealth&gt;()?.PrendreDegats(damage);<br>&nbsp;&nbsp;Destroy(gameObject);<br>}</div></div>
-      </article>
     </div>
+    <p class="also rv"><b>Aussi en développement :</b> Arena Survivor, un jeu de tir développé seul sous Unity (C#, IA NavMesh, 11 scripts), et une série de TP PHP / SQL. <a href="https://github.com/londonmajor11-cell?tab=repositories" target="_blank" rel="noopener">Voir sur GitHub →</a></p>
+  </div>
+</section>
+
+<!-- ============ WRITE-UPS ============ -->
+<section id="writeups">
+  <div class="wrap">
+    <div class="kicker rv">03 · Write-ups</div>
+    <h2><span class="mask"><span>J'explique ce que je fais</span></span></h2>
+    <p class="sub rv">Des notes détaillées sur mes TP : ce que j'ai configuré, ce qui posait problème et ce que j'améliorerais.</p>
+    <a class="wcard rv" href="writeup-linux-active-directory.html">
+      <div class="wimg"><img src="img/wu-samba-avant.png" alt="" loading="lazy"><img src="img/wu-samba-apres.png" alt="" loading="lazy"></div>
+      <div class="wtxt">
+        <div class="kicker">TP · février 2026 · 6 min de lecture</div>
+        <h3>Intégrer un serveur Linux à Active Directory, puis le sécuriser</h3>
+        <p>Jonction au domaine avec realm et SSSD, SSH réservé au groupe IT, lecture des logs, et un partage Samba ouvert aux invités que j'ai corrigé.</p>
+        <span class="wlink">Lire le write-up →</span>
+      </div>
+    </a>
   </div>
 </section>
 
 <!-- ============ PARCOURS ============ -->
 <section id="parcours">
   <div class="wrap">
-    <div class="kicker rv">03 · Parcours</div>
+    <div class="kicker rv">04 · Parcours</div>
     <h2><span class="mask"><span>D'Abidjan à l'Île-de-France</span></span></h2>
     <p class="sub rv">Les étapes qui ont construit mon profil.</p>
     <div class="tl" id="tl">
@@ -486,7 +508,7 @@ footer{border-top:1px solid var(--line);padding:24px clamp(16px,4vw,48px);color:
 <!-- ============ COMPETENCES ============ -->
 <section id="competences" style="padding-top:40px">
   <div class="wrap">
-    <div class="kicker rv">04 · Compétences</div>
+    <div class="kicker rv">05 · Compétences</div>
     <h2><span class="mask"><span>Ma boîte à outils</span></span></h2>
   </div>
   <div class="marq" aria-hidden="true"><div class="t" id="m1"></div></div>
@@ -503,7 +525,7 @@ footer{border-top:1px solid var(--line);padding:24px clamp(16px,4vw,48px);color:
 <section class="wipe" id="certifications">
   <div class="fill" id="wipefill"></div>
   <div class="wrap">
-    <div class="kicker rv">05 · Certifications</div>
+    <div class="kicker rv">06 · Certifications</div>
     <h2><span class="mask"><span>Validé et vérifiable</span></span></h2>
     <p class="sub rv">Les badges Cisco peuvent être vérifiés en ligne sur Credly.</p>
     <div class="certs">
@@ -519,7 +541,7 @@ footer{border-top:1px solid var(--line);padding:24px clamp(16px,4vw,48px);color:
 <!-- ============ TERRAIN ============ -->
 <section id="terrain">
   <div class="wrap">
-    <div class="kicker rv">06 · Expérience terrain</div>
+    <div class="kicker rv">07 · Expérience terrain</div>
     <h2><span class="mask"><span>Fiable sous pression</span></span></h2>
     <p class="sub rv">Des emplois exigeants qui m'ont appris la rigueur, la cadence et le travail en équipe.</p>
     <div class="jobs">
@@ -532,7 +554,7 @@ footer{border-top:1px solid var(--line);padding:24px clamp(16px,4vw,48px);color:
 
 <!-- ============ CONTACT ============ -->
 <section class="contact" id="contact">
-  <div class="kicker rv">07 · Contact</div>
+  <div class="kicker rv">08 · Contact</div>
   <h2 class="rv">Travaillons <span class="sel" id="sel2"><span class="h h1"></span><span class="h h2"></span><span class="h h3"></span><span class="h h4"></span>ensemble.</span></h2>
   <p class="sub rv" style="margin-inline:auto">Vous recrutez un stagiaire ou un alternant en cybersécurité ? Un e-mail suffit, je réponds rapidement.</p>
   <a class="mail rv" href="mailto:paulaurele1@gmail.com">paulaurele1@gmail.com</a>

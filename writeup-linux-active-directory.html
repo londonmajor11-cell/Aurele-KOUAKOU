@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Write-up : intégrer un serveur Linux à Active Directory — Aurèle Kouakou</title>
+<meta name="description" content="Notes de TP : joindre un serveur Linux à un domaine Active Directory, restreindre SSH, sécuriser un partage Samba et auditer à distance.">
+<meta property="og:title" content="Intégrer un serveur Linux à Active Directory — write-up">
+<meta property="og:image" content="https://londonmajor11-cell.github.io/Aurele-KOUAKOU/og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0E1116;--bg-2:#14181F;--line:#232A36;--text:#E9EDF3;--muted:#8A93A3;--blue:#3D8BFF;--green:#5BE0A8;--red:#FF7A7A;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Poppins,system-ui,sans-serif;line-height:1.75;-webkit-font-smoothing:antialiased}
+a{color:var(--blue)}
+#progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--blue);z-index:10}
+header.top{border-bottom:1px solid var(--line);padding:18px clamp(16px,4vw,48px);display:flex;justify-content:space-between;align-items:center;gap:12px}
+header.top a{color:var(--text);text-decoration:none;font-weight:600;font-size:14px}
+header.top .back{color:var(--muted)}
+header.top .back:hover{color:var(--text)}
+article{width:min(760px,100% - 32px);margin:56px auto 100px}
+.kicker{font-family:var(--mono);font-size:12px;color:var(--blue);letter-spacing:.12em;text-transform:uppercase}
+h1{font-size:clamp(30px,5vw,46px);line-height:1.12;letter-spacing:-.02em;margin:12px 0 16px}
+.meta{color:var(--muted);font-size:14px;display:flex;flex-wrap:wrap;gap:6px 16px}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0 8px}
+.tags span{font-family:var(--mono);font-size:12px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;color:#B3BBC8}
+.tldr{margin:34px 0;padding:20px 22px;border-left:3px solid var(--green);background:var(--bg-2);border-radius:0 12px 12px 0}
+.tldr b{color:var(--green);font-family:var(--mono);font-size:12px;letter-spacing:.1em}
+h2{font-size:24px;margin:48px 0 12px;letter-spacing:-.01em}
+h2 .n{font-family:var(--mono);color:var(--blue);font-size:15px;margin-right:8px}
+p{margin:12px 0;color:#CFD5DE}
+ul{margin:10px 0 10px 22px;color:#CFD5DE}
+li{margin:5px 0}
+code{font-family:var(--mono);font-size:.88em;background:#1B212B;border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+figure{margin:22px 0}
+figure img{display:block;max-width:100%;border-radius:10px;border:1px solid var(--line)}
+figcaption{font-size:13px;color:var(--muted);margin-top:8px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.duo figure{margin:0}
+.bad{color:var(--red);font-family:var(--mono);font-size:12px;font-weight:600}
+.good{color:var(--green);font-family:var(--mono);font-size:12px;font-weight:600}
+.note{margin:24px 0;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);font-size:15px}
+.note b{color:var(--text)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em}
+footer{border-top:1px solid var(--line);padding:24px clamp(16px,4vw,48px);color:var(--muted);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+@media (max-width:620px){.duo{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="top"><a class="back" href="./#writeups">← Retour au portfolio</a><a href="./">Aurèle Kouakou</a></header>
+
+<article>
+  <div class="kicker">Write-up · TP · février 2026</div>
+  <h1>Intégrer un serveur Linux à Active Directory, puis le sécuriser</h1>
+  <div class="meta"><span>Aurèle Kouakou</span><span>Bachelor Cybersécurité · IPSSI</span><span>Lecture : 6 min</span></div>
+  <div class="tags"><span>Linux</span><span>Active Directory</span><span>realm / SSSD</span><span>Kerberos</span><span>SSH</span><span>Samba</span><span>LDAP</span><span>PowerShell</span></div>
+
+  <div class="tldr"><b>EN BREF</b>
+    <p>Sur quatre jours, j'ai joint un serveur Linux au domaine <code>tp.local</code>, limité l'accès SSH à un groupe, corrigé un partage Samba ouvert à tout le monde, et mis en place un audit à distance depuis Windows. Le point clé : <strong>intégrer un serveur à l'annuaire ne suffit pas, il faut ensuite réduire ce que chacun peut faire</strong>.</p>
+  </div>
+
+  <h2><span class="n">01</span>Le contexte</h2>
+  <p>Dans une entreprise, les comptes utilisateurs sont gérés de façon centralisée dans <strong>Active Directory</strong>. Plutôt que de créer des comptes locaux sur chaque serveur Linux, on veut que les salariés s'y connectent avec <strong>leur compte du domaine</strong>, et que les droits suivent leur groupe (par exemple, le groupe IT).</p>
+  <p>Le lab : un contrôleur de domaine Windows Server (<code>192.168.10.20</code>) et un serveur Linux (<code>192.168.10.30</code>), sur le même réseau.</p>
+
+  <h2><span class="n">02</span>Joindre le serveur Linux au domaine</h2>
+  <p>Avec <code>realm</code>, le serveur rejoint le domaine et configure <strong>SSSD</strong>, le service qui interroge Active Directory pour authentifier les utilisateurs (via Kerberos). La commande <code>realm list</code> permet de vérifier le résultat :</p>
+  <figure><img src="img/linux-realm.png" alt="Sortie de realm list : domaine tp.local, kerberos-member, active-directory, sssd" loading="lazy">
+    <figcaption>Le serveur est bien membre de <code>tp.local</code> (<code>configured: kerberos-member</code>), et les comptes se connectent au format <code>utilisateur@tp.local</code>.</figcaption></figure>
+  <p>À retenir : la ligne <code>login-policy: allow-realm-logins</code> signifie que <strong>tous</strong> les comptes du domaine peuvent se connecter. C'est pratique pour tester, mais trop large pour la production : c'est l'objet des étapes suivantes.</p>
+
+  <h2><span class="n">03</span>Restreindre l'accès SSH</h2>
+  <p>Deux réglages dans <code>/etc/ssh/sshd_config</code> :</p>
+  <div class="duo">
+    <figure><img src="img/wu-sshd-pwd.png" alt="PasswordAuthentication no dans sshd_config" loading="lazy"><figcaption><code>PasswordAuthentication no</code> : plus de connexion par simple mot de passe.</figcaption></figure>
+    <figure><img src="img/linux-sshd.png" alt="AllowGroups IT dans sshd_config" loading="lazy"><figcaption><code>AllowGroups IT</code> : seul le groupe IT peut se connecter en SSH.</figcaption></figure>
+  </div>
+  <div class="note"><b>Point d'attention :</b> si l'on désactive l'authentification par mot de passe, les comptes du domaine doivent se connecter autrement (clés SSH ou ticket Kerberos). Sinon, on bloque aussi les utilisateurs légitimes. Il faut donc tester avec un compte avant de fermer sa propre session.</div>
+
+  <h2><span class="n">04</span>Lire les logs pour vérifier</h2>
+  <p>Pour voir ce que fait réellement le serveur, j'ai filtré les messages de SSSD dans le journal d'authentification :</p>
+  <figure><img src="img/linux-authlog.png" alt="grep pam_sss /var/log/auth.log : échecs d'authentification" loading="lazy">
+    <figcaption><code>sudo grep "pam_sss" /var/log/auth.log | tail -n 10</code> : on y voit les tentatives refusées, l'utilisateur et l'adresse IP d'origine.</figcaption></figure>
+  <p>Les messages <code>authentication failure</code> et <code>User not known to the underlying authentication module</code> indiquent que la connexion a été refusée, avec l'IP et le compte concernés. C'est exactement ce qu'un analyste SOC surveille : <strong>des échecs répétés depuis une même IP</strong> peuvent signaler une attaque par force brute.</p>
+
+  <h2><span class="n">05</span>Le partage Samba : avant / après</h2>
+  <p>C'est la partie la plus parlante du TP. Le premier partage créé était <strong>ouvert à tout le monde</strong> :</p>
+  <div class="duo">
+    <figure><img src="img/wu-samba-avant.png" alt="Partage Samba avec read only = no et guest ok = yes" loading="lazy"><figcaption><span class="bad">AVANT</span> · écriture autorisée (<code>read only = no</code>) et accès invité (<code>guest ok = yes</code>) : n'importe qui sur le réseau peut lire, modifier ou déposer des fichiers.</figcaption></figure>
+    <figure><img src="img/wu-samba-apres.png" alt="Partage Samba sécurisé : read only, pas d'invité, valid users @IT" loading="lazy"><figcaption><span class="good">APRÈS</span> · lecture seule, invités refusés et accès réservé au groupe IT (<code>valid users = @IT</code>).</figcaption></figure>
+  </div>
+  <p>Un partage ouvert aux invités en écriture est une porte d'entrée classique : fuite de données, dépôt de fichiers malveillants, ou rançongiciel qui chiffre tout le dossier. La règle appliquée ici est le <strong>moindre privilège</strong> : seules les personnes qui en ont besoin y accèdent, avec le minimum de droits.</p>
+
+  <h2><span class="n">06</span>Auditer et automatiser</h2>
+  <p>Pour ne pas se connecter à la main à chaque fois, j'ai écrit deux petits scripts :</p>
+  <figure><img src="img/wu-ps-audit.png" alt="Script PowerShell qui interroge le serveur Linux en SSH" loading="lazy">
+    <figcaption>Depuis Windows, un script PowerShell interroge le serveur Linux en SSH : nom, adresse IP, espace disque et temps de fonctionnement.</figcaption></figure>
+  <figure><img src="img/wu-ldap.png" alt="Script ldapsearch listant les membres d'un groupe" loading="lazy">
+    <figcaption>Un script <code>ldapsearch</code> liste les membres d'un groupe Active Directory. Le mot de passe est demandé à l'exécution (<code>-W</code>) au lieu d'être écrit dans le script.</figcaption></figure>
+  <p>J'ai aussi planifié une tâche <code>cron</code> toutes les 5 minutes pour enregistrer l'espace disque dans un fichier de log.</p>
+
+  <h2><span class="n">07</span>Ce que j'améliorerais aujourd'hui</h2>
+  <table>
+    <tr><th>Constat</th><th>Amélioration</th></tr>
+    <tr><td><code>allow-realm-logins</code> : tout le domaine peut se connecter</td><td>Limiter avec <code>realm permit -g IT</code>, en plus de <code>AllowGroups</code></td></tr>
+    <tr><td>Requêtes LDAP en clair (port 389)</td><td>Passer en <strong>LDAPS</strong> (port 636) pour chiffrer les échanges avec l'annuaire</td></tr>
+    <tr><td>Logs consultés à la main</td><td>Ajouter <strong>fail2ban</strong>, ou envoyer les logs vers un outil centralisé (SIEM)</td></tr>
+    <tr><td>Logs de supervision dans <code>/tmp</code></td><td>Les écrire dans <code>/var/log</code>, avec une rotation (logrotate)</td></tr>
+  </table>
+
+  <h2><span class="n">08</span>Ce que j'en retiens</h2>
+  <ul>
+    <li>Joindre un serveur à Active Directory, c'est facile. <strong>Le vrai travail, c'est de restreindre ensuite.</strong></li>
+    <li>Une seule ligne de configuration (<code>guest ok = yes</code>) peut exposer tout un dossier.</li>
+    <li>Toujours <strong>vérifier dans les logs</strong> que la configuration fait bien ce qu'on croit.</li>
+    <li>Automatiser l'audit permet de contrôler plusieurs serveurs sans erreur de manipulation.</li>
+  </ul>
+</article>
+
+<footer><span>© 2026 Aurèle Kouakou</span><a href="./">← Retour au portfolio</a></footer>
+<script>
+addEventListener('scroll',()=>{const h=document.documentElement;document.getElementById('progress').style.width=(scrollY/(h.scrollHeight-innerHeight)*100)+'%'},{passive:true});
+</script>
+</body>
+</html>
